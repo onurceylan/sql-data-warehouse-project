@@ -9,7 +9,7 @@ Script Purpose:
 ===============================================================================
 */
 
-IF OBJECT_ID('bronze.crm_cust_info', 'U') IS NOT NULL
+IF OBJECT_ID('bronze.crm_cust_info', 'U') IS NOT NULL -- u burada adı verilenin bir tablo mu olduğunu kontrol eder.
     DROP TABLE bronze.crm_cust_info;
 GO
 
