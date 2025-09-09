@@ -1,0 +1,26 @@
+-- Check for Nulls or Duplicates in Primary Key
+-- Expectation : No Result
+
+Select
+cst_id,
+COUNT(*)
+from bronze.crm_cust_info
+group by cst_id
+HAVING COUNT(*) > 1 OR cst_id is null
+
+-- check for unwanted spaces 
+-- expectation : No results
+SELECT cst_firstname
+FROM bronze.crm_cust_info
+WHERE cst_firstname != TRIM(cst_firstname)
+
+-- Expectation: No Result
+SELECT cst_key
+FROM bronze.crm_cust_info
+where cst_key =! TRIM(cst_key)
+
+-- Data Standardization & Consistency
+SELECT DISTINCT cst_gndr
+FROM bronze.crm_cust_info
+
+-- in our DWH we aim to store clear and meaningful values rather then using abbreviated(kısaltılmış) terms
