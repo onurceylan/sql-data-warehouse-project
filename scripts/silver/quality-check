@@ -14,6 +14,10 @@ SELECT cst_firstname
 FROM silver.crm_cust_info
 WHERE cst_firstname != TRIM(cst_firstname)
 
+SELECT cst_lastname
+FROM silver.crm_cust_info
+WHERE cst_lastname != TRIM(cst_lastname)
+
 -- Expectation: No Result
 SELECT cst_key
 FROM silver.crm_cust_info
