@@ -8,15 +8,24 @@ from silver.crm_cust_info
 group by cst_id
 HAVING COUNT(*) > 1 OR cst_id is null
 
+Select
+prd_id,
+COUNT(*)
+from silver.crm_prd_info
+group by prd_id
+HAVING COUNT(*) > 1 OR prd_id is null
+
 -- check for unwanted spaces 
 -- expectation : No results
 SELECT cst_firstname
 FROM silver.crm_cust_info
 WHERE cst_firstname != TRIM(cst_firstname)
 
-SELECT cst_lastname
-FROM silver.crm_cust_info
-WHERE cst_lastname != TRIM(cst_lastname)
+-- Check for nulls or Negative Numbers
+-- Expectation: No Results
+SELECT prd_cost
+FROM silver.crm_prd_info
+WHERE prd_cost < 0 OR prd_cost IS NULL
 
 -- Expectation: No Result
 SELECT cst_key
@@ -27,7 +36,20 @@ where cst_key != TRIM(cst_key)
 SELECT DISTINCT cst_gndr
 FROM silver.crm_cust_info
 
+-- Data Standardization & Consistency
+SELECT DISTINCT prd_line
+FROM silver.crm_prd_info
+
 -- in our DWH we aim to store clear and meaningful values rather then using abbreviated(kısaltılmış) terms
+
+-- Check for Invalid Date Orders
+SELECT * 
+FROM silver.crm_prd_info
+WHERE prd_end_dt < prd_start_dt
+
+SELECT * FROM silver.crm_cust_info
 
 -- deleting all data
 TRUNCATE TABLE silver.crm_cust_info;
+
+
