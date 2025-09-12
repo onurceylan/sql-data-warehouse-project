@@ -46,3 +46,65 @@ FROM bronze.crm_prd_info
 SELECT * 
 FROM bronze.crm_prd_info
 WHERE prd_end_dt < prd_start_dt
+
+-- Sales quality check
+-- Check for invalid days
+-- in this scenerio, the length of the date must be 8
+-- check for outliers by validating the boundaries of the data range
+SELECT
+NULLIF(sls_order_dt,0) AS sls_order_dt -- NULLIF() Returns NULL if two given values are equal; otherwise, it returns the first expression 
+FROM bronze.crm_sales_details 
+WHERE sls_order_dt <= 0  -- negative numbers or zeros can't be cast to a date
+	  OR LEN(sls_order_dt) !=8 
+	  OR sls_order_dt > 20500101 
+	  OR sls_order_dt < 19000101 
+
+-- Check for invalid date orders
+SELECT
+*
+FROM bronze.crm_sales_details
+WHERE sls_order_dt > sls_ship_dt OR sls_order_dt > sls_due_dt -- Order Date must always be earlier then the Shipping Date or Due Date
+
+
+-- Check Data Consistency: Between Sales, quantity and price
+-- >> Sales = Quantity * Price
+-- >> Values must not be Null, zero or negative 
+SELECT DISTINCT
+sls_sales,
+sls_quantitiy,
+sls_price
+FROM bronze.crm_sales_details 
+WHERE sls_sales != sls_quantitiy * sls_price
+OR sls_sales IS NULL OR sls_quantitiy IS NULL OR  sls_price IS NULL
+OR sls_sales <= 0 OR sls_quantitiy <= 0 OR  sls_price <= 0
+ORDER BY sls_sales, sls_quantitiy, sls_price
+/*
+There are issues in sales, quantity and price datas so we need to ask and discuss with experts
+solution1 : Data issues will be fixed direct in source system
+solution2 : Data Issues has to be fixed in data warehouse
+
+Rules:
+If Sales is negative, zero or null derive it using Quantity and Price
+If Price is zero or null, calculate it using Sales and Quantity
+If Price is negative, convert it to a positive value
+ here is the following updated code:
+*/
+
+SELECT DISTINCT
+sls_sales as old_sls_sales,
+sls_quantitiy,
+sls_price as old_sls_price,
+CASE WHEN sls_sales IS NULL OR sls_sales <= 0 OR sls_sales != sls_quantitiy * ABS(sls_price) -- ABS return absolute value of a number (mutlak değerini alır)
+		THEN sls_quantitiy * ABS(sls_price)
+	 ELSE sls_sales
+END AS sls_sales,
+
+CASE WHEN sls_price IS NULL OR sls_price <= 0 
+		THEN sls_SALES / NULLIF(sls_quantitiy,0)
+	 ELSE sls_price
+END AS sls_price
+FROM bronze.crm_sales_details 
+WHERE sls_sales != sls_quantitiy * sls_price
+OR sls_sales IS NULL OR sls_quantitiy IS NULL OR  sls_price IS NULL
+OR sls_sales <= 0 OR sls_quantitiy <= 0 OR  sls_price <= 0
+ORDER BY sls_sales, sls_quantitiy, sls_price
