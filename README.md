@@ -91,3 +91,10 @@ data-warehouse-project/
 ├── README.md                           # Project overview and instructions
 ├── LICENSE                             # License information for the repository
 ```
+## 🌟 About Me
+
+Hi, I'm **Onur Ceylan**. I’m a fresh-graduate candidate trying to be AI-Data Engineer. I am trying to improve myself mostly at python and sql.
+Let's stay in touch! Feel free to connect with me.
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/onur-ceylan-12b750243/)
+
